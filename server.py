@@ -1,5 +1,4 @@
 from flask import Flask, jsonify
-import fetchExectute1
 from FetchProcessData import CustomProcessFetcher
 app = Flask(__name__)
 
