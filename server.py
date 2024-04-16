@@ -1,0 +1,27 @@
+from flask import Flask, jsonify
+import fetchExectute1
+from FetchProcessData import CustomProcessFetcher
+app = Flask(__name__)
+
+# Assuming df is defined and contains the DataFrame you want to serve
+bearer_token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTbG1SbG1TN3V0OWtjUHZJdERQTk9UNG45c1F5RDNJTGpmdWs4TU5jQzZZIn0.eyJleHAiOjE3MTM4MjkxMTMsImlhdCI6MTcxMzIyNDMxMywianRpIjoiNWEzYjZjZDYtZjcxMy00NjA5LTkxODAtMTIyMjVmYmRmMTcwIiwiaXNzIjoiaHR0cDovL2tleWNsb2FrOjgwODAvcmVhbG1zL0FkdmFuY2VkIiwiYXVkIjoiYWNjb3VudCIsInN1YiI6ImRiNzdlYzZiLWQyZWEtNDRiZS04MTYyLWY1YmU5NzY5YmM4NSIsInR5cCI6IkJlYXJlciIsImF6cCI6ImNsaWVudCIsInNlc3Npb25fc3RhdGUiOiI0Nzc0OGMwZi1kZGEwLTQyYjgtYTY3My1iMjFkMjY1MmU3ODUiLCJhY3IiOiIxIiwiYWxsb3dlZC1vcmlnaW5zIjpbIi8qIl0sInJlYWxtX2FjY2VzcyI6eyJyb2xlcyI6WyJleHBlcnQiLCJkZWZhdWx0LXJvbGVzLXRlc3QiLCJvZmZsaW5lX2FjY2VzcyIsInVtYV9hdXRob3JpemF0aW9uIl19LCJyZXNvdXJjZV9hY2Nlc3MiOnsiYWNjb3VudCI6eyJyb2xlcyI6WyJtYW5hZ2UtYWNjb3VudCIsIm1hbmFnZS1hY2NvdW50LWxpbmtzIiwidmlldy1wcm9maWxlIl19fSwic2NvcGUiOiJvcGVuaWQgZ3JvdXBzIHByb2ZpbGUgZW1haWwiLCJzaWQiOiI0Nzc0OGMwZi1kZGEwLTQyYjgtYTY3My1iMjFkMjY1MmU3ODUiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwicHJlZmVycmVkX3VzZXJuYW1lIjoiZXhwZXJ0IiwiZ2l2ZW5fbmFtZSI6IiIsImZhbWlseV9uYW1lIjoiIn0.HPHgX50MldCydoc_moFLs1T6LuuJj8dUB7ea45X5PuMMsWX3OY0CCUYCm4umaTDStRecxJ0Tl-0GQyxWXEUwbLjh6KU73Ev2l7CwMC6PXiyyLAQZqlg_3pyOJai1ygOSnuMqeZUgt2-sffIhLnkJy69lCRGJbmArr8pl_jpliuSYJwq3zC306hpnRRoFIHMN2RtbL6GOYr_rNhRDd-Mm6pxl0aHczFaxg-BVnE3iQRo08Zdyn_G_P7kwmxmhzH4d8KN_NUofDw3O6g4Zei0MVPicjrKcNjLhpp0PEomax7OFZ_hfTYOKjXllPzN14CjtXuneKjXTQsduJfQl4jmOEw"
+urlCustomization = "http://localhost:30226/api/v1/customized-process"
+urlExecute = "http://localhost:30226/api/v1/basic/calculate-scenario"
+urlImpact = "http://localhost:30226/api/v1/impact-method/6070b11f-e863-486c-9748-14341de36259"
+scenarioId = "fec0fde6-eca3-44c0-a5d3-e992eb727948"
+
+custom_process_fetcher = CustomProcessFetcher(bearer_token,scenarioId, urlCustomization,urlImpact,urlExecute)
+
+@app.route('/fetchData', methods=['GET'])
+def get_table_data():
+    data = custom_process_fetcher.fetch_custom_process()
+    return jsonify(data)
+
+@app.route('/fetchExecute', methods=['GET'])
+def get_table_execute():
+    data = custom_process_fetcher.fetch_execute()
+    return jsonify(data)
+
+
+if __name__ == '__main__':
+    app.run(debug=True)
