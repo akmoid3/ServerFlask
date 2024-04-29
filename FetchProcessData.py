@@ -3,51 +3,59 @@ import pandas as pd
 
 
 class CustomProcessFetcher:
-    def __init__(self, bearer_token,scenarioid, urlcustomization,urlimpact, urlexecute):
+    def __init__(self, bearer_token, urlcustomization,urlimpact, urlexecute):
         self.bearer_token = bearer_token
         self.urlCustomization = urlcustomization
         self.urlExecute = urlexecute
-        self.scenarioId = scenarioid
         self.urlImpact = urlimpact
 
-    def fetch_custom_process(self):
+    def fetch_custom_process(self, scenarioid):
         headers = {
             'Authorization': f'Bearer {self.bearer_token}',
             'Content-Type': 'application/json; charset=utf-8'
         }
-        url = f"{self.urlCustomization}/{self.scenarioId}"
+        url = f"{self.urlCustomization}/{scenarioid}"
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
             data = response.json()["customization"]["parameters"]
             table = {}
             for item in data:
+                key = item["display"]["tab"]
                 alias = item["alias"]
-                table[alias] = {
-                    "options": [],
-                    "unit": item.get("unitOfMeasure"),
-                    "current value": item.get("value")
-                }
+
+                # Append the alias to the table[key]
+                if key not in table:
+                    table[key] = {}
 
                 options = item.get("options")
-                if options is None:
-                    continue
-                for option in options:
-                    table[alias]["options"].append(option.get("label"))
-                    if option.get("value") == item.get("value"):
-                        table[alias]["current value"] = option.get("label")
+                if options is not None:
+                    if item.get("unitOfMeasure") is not None:
+                        table[key][alias] = {"options": [], "unit": item.get("unitOfMeasure"),
+                                             "current value": item.get("value")}
+                    else:
+                        table[key][alias] = {"options": [], "current value": item.get("value")}
+                    for option in options:
+                        table[key][alias]["options"].append(option.get("label"))
+                        if option.get("value") == item.get("value"):
+                            table[key][alias]["current value"] = option.get("label")
+                else:
+                    if item.get("unitOfMeasure") is not None:
+                        table[key][alias] = {"unit": item.get("unitOfMeasure"), "current value": item.get("value")}
+                    else:
+                        table[key][alias] = {"current value": item.get("value")}
 
             return table
         else:
             return response.status_code
 
-    def fetch_execute(self):
+    def fetch_execute(self, scenarioid):
         headers = {
             'Authorization': f'Bearer {self.bearer_token}',
             'Content-Type': 'application/json; charset=utf-8'
         }
         params = {
-            'scenarioId': self.scenarioId
+            'scenarioId': scenarioid
         }
 
         response = requests.post(self.urlExecute, headers=headers, params=params)
