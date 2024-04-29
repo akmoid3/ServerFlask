@@ -3,11 +3,12 @@ import pandas as pd
 
 
 class CustomProcessFetcher:
-    def __init__(self, bearer_token, urlcustomization,urlimpact, urlexecute):
+    def __init__(self, bearer_token, urlcustomization,urlimpact, urlexecute, urlscenarioname):
         self.bearer_token = bearer_token
         self.urlCustomization = urlcustomization
         self.urlExecute = urlexecute
         self.urlImpact = urlimpact
+        self.urlScenarioName = urlscenarioname
 
     def fetch_custom_process(self, scenarioid):
         headers = {
@@ -94,6 +95,22 @@ class CustomProcessFetcher:
 
         if response.status_code == 200:
             names = response.json()
+            return names
+        else:
+            return response.status_code
+
+
+    def fetch_scenario_name(self,scenarioid):
+        url = f"{self.urlScenarioName}/{scenarioid}"
+        headers = {
+            "Authorization": f'Bearer {self.bearer_token}',
+            "Content-Type": "application/json"
+        }
+
+        response = requests.get(url, headers=headers)
+
+        if response.status_code == 200:
+            names = response.json()["name"]
             return names
         else:
             return response.status_code

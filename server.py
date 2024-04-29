@@ -7,8 +7,8 @@ bearer_token = "eyJhbGciOiJSUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICJTbG1SbG1TN3V0
 urlCustomization = "http://localhost:30226/api/v1/customized-process"
 urlExecute = "http://localhost:30226/api/v1/basic/calculate-scenario"
 urlImpact = "http://localhost:30226/api/v1/impact-method/6070b11f-e863-486c-9748-14341de36259"
-
-custom_process_fetcher = CustomProcessFetcher(bearer_token, urlCustomization,urlImpact,urlExecute)
+urlScenarioName = "http://localhost:30226/api/v1/scenario"
+custom_process_fetcher = CustomProcessFetcher(bearer_token, urlCustomization, urlImpact, urlExecute, urlScenarioName)
 
 @app.route('/fetchData/<scenarioid>', methods=['GET'])
 def get_table_data(scenarioid):
@@ -20,6 +20,10 @@ def get_table_execute(scenarioid):
     data = custom_process_fetcher.fetch_execute(scenarioid)
     return jsonify(data)
 
+@app.route('/fetchName/<scenarioid>', methods=['GET'])
+def get_scenario_name(scenarioid):
+    data = custom_process_fetcher.fetch_scenario_name(scenarioid)
+    return jsonify(data)
 
 if __name__ == '__main__':
     app.run(debug=True)
